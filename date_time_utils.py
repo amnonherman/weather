@@ -1,5 +1,6 @@
 from datetime import datetime
 import pytz
+import requests
 
 def get_date_time_for_timezones(user_timezone, location_timezone):
     """
@@ -26,3 +27,18 @@ def get_date_time_for_timezones(user_timezone, location_timezone):
     except Exception as e:
         # Return an error if time zone conversion fails
         return {"error": str(e)}
+
+def get_timezone_from_ip():
+    """
+    Determine the user's time zone based on their public IP address.
+    Returns:
+        str: The time zone string (e.g., "Europe/London") or None if detection fails.
+    """
+    try:
+        response = requests.get("https://ipinfo.io/json")
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("timezone")
+        return None
+    except Exception as e:
+        return None
