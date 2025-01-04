@@ -7,8 +7,9 @@ def fetch_weather(city_name, api_key):
         data = response.json()
         return {
             "weather_data": data,
-            "location_timezone": data.get("timezone")
+            "location_timezone": data.get("timezone")  # Time zone offset in seconds
         }
     else:
         return None
+
 
