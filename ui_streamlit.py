@@ -1,14 +1,17 @@
 import streamlit as st
 from weather_fetcher import fetch_weather
-from date_time_utils import get_date_time_for_timezones
+from tzlocal import get_localzone
 from timezonefinder import TimezoneFinder
+from date_time_utils import get_date_time_for_timezones
 
 def weather_app():
     st.title("Weather Checker Application")
     api_key = "7f9c3335a0711025a0ab6941bfdb37f2"
 
+    # Automatically detect the user's local time zone
+    user_timezone = str(get_localzone())
+
     city_name = st.text_input("Enter city name:")
-    user_timezone = "Europe/London"  # Replace this with your actual time zone
 
     if st.button("Get Weather"):
         if city_name:
