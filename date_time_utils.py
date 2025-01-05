@@ -25,7 +25,6 @@ def get_date_time_for_timezones(user_timezone, location_timezone):
             "location_time": formatted_location_time
         }
     except Exception as e:
-        # Return an error if time zone conversion fails
         return {"error": str(e)}
 
 def get_timezone_from_ip():
