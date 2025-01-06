@@ -23,14 +23,15 @@ def fetch_weather(city_name, unit="metric"):
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        weather_data = { # Store the fetched data in a dictionary
+        weather_data = {
             "temperature": data["main"]["temp"],
             "humidity": data["main"]["humidity"],
             "description": data["weather"][0]["description"],
-            "timezone_offset": data["timezone"],  # Offset in seconds from UTC
+            "timezone_offset": data["timezone"],
             "city": data["name"],
             "country": data["sys"]["country"],
-         }
+            "icon": data["weather"][0]["icon"]  # Get the icon code
+        }
         weather_data["coord"] = coordinates
         return weather_data
     else:
