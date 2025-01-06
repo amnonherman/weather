@@ -3,6 +3,10 @@ import requests
 from datetime import datetime, timedelta
 import json
 import os
+import folium
+from streamlit_folium import folium_static
+from weather_fetcher import fetch_weather
+from get_coordinates import get_coordinates
 
 # OpenWeatherMap API key
 API_KEY = "7f9c3335a0711025a0ab6941bfdb37f2"
@@ -36,31 +40,6 @@ def save_settings(settings):
     """
     with open(SETTINGS_FILE, "w") as f:
         json.dump(settings, f, indent=4)
-
-
-def fetch_weather(city_name, unit="metric"):
-    """
-    Fetch weather details for the given city using OpenWeatherMap API.
-    Args:
-        city_name (str): The city name for which to fetch weather details.
-        unit (str): Temperature unit ('metric' for Celsius, 'imperial' for Fahrenheit).
-    Returns:
-        dict: Weather details including temperature, humidity, description, and timezone offset.
-    """
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={API_KEY}&units={unit}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return {
-            "temperature": data["main"]["temp"],
-            "humidity": data["main"]["humidity"],
-            "description": data["weather"][0]["description"],
-            "timezone_offset": data["timezone"],  # Offset in seconds from UTC
-            "city": data["name"],
-            "country": data["sys"]["country"]
-        }
-    else:
-        return None
 
 
 def get_local_time(timezone_offset):
@@ -113,18 +92,18 @@ def weather_app():
 
     # Check if weather data should be fetched
     if "weather_fetched" in st.session_state and st.session_state["weather_fetched"]:
-        # Determine city to fetch weather for
         city_to_fetch = st.session_state.get("city_name", "")
         if city_to_fetch:
-            # Default unit: Celsius
-            unit = "metric"
-            weather_details = fetch_weather(city_to_fetch, unit=unit)
+            weather_details = fetch_weather(city_to_fetch)
+
+            # Debugging: Display weather details
+            # st.write("Debugging Weather Details:", weather_details) # Removed Debug Output
 
             if weather_details:
                 # Display weather details
                 st.success(f"Weather details for {weather_details['city']}, {weather_details['country']}:")
 
-                # Display temperature with unit toggle below it
+                # Allow the user to toggle between Celsius and Fahrenheit
                 selected_unit = st.radio(
                     "Choose temperature unit:",
                     options=["Celsius", "Fahrenheit"],
@@ -133,12 +112,12 @@ def weather_app():
                     key="temp_unit"
                 )
 
-                # Update temperature based on the selected unit
+                # Update temperature based on selected unit
+                temperature = weather_details["temperature"]
                 if selected_unit == "Fahrenheit":
                     temperature = round(weather_details["temperature"] * 9 / 5 + 32, 2)
                     st.write(f"**Temperature:** {temperature}°F")
                 else:
-                    temperature = weather_details["temperature"]
                     st.write(f"**Temperature:** {temperature}°C")
 
                 # Display other weather details
@@ -154,13 +133,27 @@ def weather_app():
                     if st.button(f"Add {city_to_fetch} to Favorites"):
                         # Manage up to 5 favorites
                         if len(settings["favorites"]) >= 5:
-                            settings["favorites"].pop(0)  # Remove oldest favorite
+                            settings["favorites"].pop(0)  # Remove the oldest favorite
                         settings["favorites"].append(city_to_fetch)
                         save_settings(settings)
                         st.success(f"{city_to_fetch} added to favorites!")
-                        # Reset state to re-render favorites
                         st.session_state["weather_fetched"] = False
-                        st.rerun()  # Updated to st.rerun
+                        st.rerun()
+
+                # Display interactive map if coordinates are available
+                coordinates = get_coordinates(city_to_fetch)
+                if coordinates:
+                    latitude = coordinates["lat"]
+                    longitude = coordinates["lon"]
+                    location_map = folium.Map(location=[latitude, longitude], zoom_start=10)
+                    folium.Marker(
+                        [latitude, longitude],
+                        popup=f"{city_to_fetch}",
+                        tooltip="Weather Location"
+                    ).add_to(location_map)
+                    folium_static(location_map)
+                else:
+                    st.error("Unable to fetch coordinates for this location.")
             else:
                 st.error("City not found. Please check the name and try again.")
         else:

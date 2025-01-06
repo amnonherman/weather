@@ -13,6 +13,8 @@ plotly = "^5.24.1"
 pytz = "^2024.2"
 timezonefinder = "^6.5.7"
 tzlocal = "^5.2"
+folium = "^0.19.4"
+streamlit-folium = "^0.24.0"
 
 
 [build-system]

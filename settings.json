@@ -1,10 +1,10 @@
 {
     "default_location": null,
     "favorites": [
-        "Tokyo",
-        "Los Angeles",
-        "sydney",
         "London",
-        "Haifa"
+        "Haifa",
+        "Jerusalem",
+        "Rehovot",
+        "New York"
     ]
 }
