@@ -9,7 +9,7 @@ from weather_fetcher import fetch_weather
 from get_coordinates import get_coordinates
 
 # OpenWeatherMap API key
-API_KEY = "7f9c3335a0711025a0ab6941bfdb37f2"
+API_KEY = st.secrets["openweathermap"]["api_key"]
 
 # Path for the settings JSON file
 SETTINGS_FILE = os.path.join(os.path.dirname(__file__), "settings.json")

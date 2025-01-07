@@ -1,7 +1,7 @@
 import requests
 from get_coordinates import get_coordinates
 
-API_KEY = "7f9c3335a0711025a0ab6941bfdb37f2"
+API_KEY = st.secrets["openweathermap"]["api_key"]
 
 def fetch_weather(city_name, unit="metric"):
     """

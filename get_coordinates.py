@@ -1,5 +1,5 @@
 import requests
-API_KEY = "7f9c3335a0711025a0ab6941bfdb37f2"
+API_KEY = st.secrets["openweathermap"]["api_key"]
 def get_coordinates(city_name):
     """
     Get geographical coordinates for a city using OpenWeatherMap's Geocoding API.
