@@ -1,4 +1,5 @@
 import requests
+import streamlit as st
 API_KEY = st.secrets["openweathermap"]["api_key"]
 def get_coordinates(city_name):
     """
